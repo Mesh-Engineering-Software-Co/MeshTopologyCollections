@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Title>Mesh Topology Colletions</Title>
+    <Authors>Mustafa Senturk</Authors>
+    <Company>Mesh Engineering &amp; Software</Company>
+    <Description>This library has collections to be utilized during mesh contructions.</Description>
+    <IncludeSymbols>True</IncludeSymbols>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <Version>1.0.1</Version>
+    <PackAsTool>False</PackAsTool>
+  </PropertyGroup>
+
+</Project>
