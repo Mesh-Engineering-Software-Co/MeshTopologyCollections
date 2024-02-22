@@ -11,9 +11,10 @@ namespace MeshTopologyCollections
     /// </summary>
     public class TopologyVertexList : IEnumerable<KeyValuePair<VertexIndex, Vertex>>
     {
-        SortedList<string, Vertex> _verticeChecker;
-        Dictionary<VertexIndex, Vertex> _vertices;
-        Dictionary<Vertex, VertexIndex> _indexes;
+        SortedList<string, Tuple<double, double, double>> _verticeChecker;
+        Dictionary<VertexIndex, Tuple<double, double, double>> _vertices;
+        Dictionary<Tuple<double, double, double>, VertexIndex> _indexes;
+        ProxyManager _proxyManager;
         int _counter;
         int _precision;
         /// <summary>
@@ -25,7 +26,7 @@ namespace MeshTopologyCollections
         /// </summary>
         public int Count { get => _vertices.Count; }
         /// <summary>
-        /// Precision is used when a new item is added. 
+        /// Precision is  the number of digits after decimal seperatr, used when a new item is added. 
         /// If the difference of the values of the point item is not greater then an already adde item,
         /// then the new item is accepted as already added.
         /// </summary>
@@ -33,9 +34,10 @@ namespace MeshTopologyCollections
         public TopologyVertexList(int precision)
         {
             _precision = precision;
-            _verticeChecker = new SortedList<string, Vertex>();
-            _vertices = new Dictionary<VertexIndex, Vertex>();
-            _indexes = new Dictionary<Vertex, VertexIndex>();
+            _proxyManager = new ProxyManager(precision);
+            _verticeChecker = new SortedList<string, Tuple<double, double, double>>();
+            _vertices = new Dictionary<VertexIndex, Tuple<double, double, double>>();
+            _indexes = new Dictionary<Tuple<double, double, double>, VertexIndex>();
             _counter = 0;
         }
         /// <summary>
@@ -44,12 +46,9 @@ namespace MeshTopologyCollections
         /// </summary>
         /// <param name="point"></param>
         /// <returns></returns>
-        public VertexIndex AddVertex(Vertex point)
+        public VertexIndex AddVertex(Tuple<double, double, double> point)
         {
-            string formatter = $"F{_precision}";
-            string proxy = $"{point.Item1.ToString(formatter)};" +
-                $"{point.Item2.ToString(formatter)};" +
-                $"{point.Item3.ToString(formatter)};";
+            string proxy = GetStringProxy(point);
             if (_verticeChecker.ContainsKey(proxy))
             {
                 var tup = _verticeChecker[proxy];
@@ -93,11 +92,11 @@ namespace MeshTopologyCollections
         /// </summary>
         /// <param name="index"></param>
         /// <returns></returns>
-        public Vertex GetVertex(VertexIndex index)
+        public Tuple<double, double, double> GetVertex(VertexIndex index)
         {
             return _vertices[index];
         }
-        public Vertex this[VertexIndex key]
+        public Tuple<double, double, double> this[VertexIndex key]
         {
             get
             {
@@ -121,7 +120,7 @@ namespace MeshTopologyCollections
         /// </summary>
         /// <param name="point"></param>
         /// <returns></returns>
-        public VertexIndex IndexOf(Vertex point)
+        public VertexIndex IndexOf(Tuple<double, double, double> point)
         {
             string proxy = GetStringProxy(point);
             if (_verticeChecker.ContainsKey(proxy))
@@ -135,18 +134,15 @@ namespace MeshTopologyCollections
         /// returns the vertices in this collection as a list of tuples.
         /// </summary>
         /// <returns></returns>
-        public List<Vertex> GetVertices()
+        public List<Tuple<double, double, double>> GetVertices()
         {
             return _vertices.Values.ToList();
         }
-        private string GetStringProxy(Vertex point)
+        private string GetStringProxy(Tuple<double, double, double> point)
         {
-            string formatter = $"F{_precision}";
-            string proxy = $"{point.Item1.ToString(formatter)};" +
-                $"{point.Item2.ToString(formatter)};" +
-                $"{point.Item3.ToString(formatter)};";
-            return proxy;
+            return _proxyManager.GetStringProxy(point);
         }
+
         #region Enumaration
         public IEnumerator<KeyValuePair<VertexIndex, Vertex>> GetEnumerator()
         {
@@ -163,7 +159,45 @@ namespace MeshTopologyCollections
             get => new LfemVertexEnum(this, _vertices.Keys.ToList());
         }
         #endregion
+
+        private class ProxyManager
+        {
+            string _formatter;
+            double _multiplier = 1;
+            internal ProxyManager(int precision)
+            {
+                if (precision > 1)
+                {
+                    _formatter = $"F{precision}";
+                    GetStringProxy = GetStringProxy1;
+                }
+                else
+                {
+                    _multiplier = Math.Pow(10, precision);
+                    _formatter = $"F0";
+                    GetStringProxy = GetStringProxy2;
+                }
+            }
+            internal Func<Tuple<double, double, double>, string> GetStringProxy;
+            //only use when _precision is less than 1 including negative values
+            private string GetStringProxy2(Tuple<double, double, double> point)
+            {
+                string proxy = $"{(point.Item1 * _multiplier).ToString(_formatter)};" +
+                    $"{(point.Item2 * _multiplier).ToString(_formatter)};" +
+                    $"{(point.Item3 * _multiplier).ToString(_formatter)};";
+                return proxy;
+            }
+            private string GetStringProxy1(Tuple<double, double, double> point)
+            {
+                string proxy = $"{point.Item1.ToString(_formatter)};" +
+                    $"{point.Item2.ToString(_formatter)};" +
+                    $"{point.Item3.ToString(_formatter)};";
+                return proxy;
+            }
+        }
     }
+
+
     /// <summary>
     /// Enumerator of the TopologyVertexList.
     /// </summary>
