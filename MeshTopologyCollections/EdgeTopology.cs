@@ -6,14 +6,14 @@ namespace MeshTopologyCollections
     /// <summary>
     /// maps edge indexes with start and end point indexes. Creates a connection map
     /// </summary>
-    internal class EdgeTopology
+    public class EdgeTopology
     {
         Dictionary<VertexIndex, EdgesOfPoint> _startPointToEdge;
         Dictionary<VertexIndex, EdgesOfPoint> _endPointToEdge;
         /// <summary>
         /// initialize an empty LfemEdgeList
         /// </summary>
-        internal EdgeTopology()
+        public EdgeTopology()
         {
             _startPointToEdge = new Dictionary<VertexIndex, EdgesOfPoint>();
             _endPointToEdge = new Dictionary<VertexIndex, EdgesOfPoint>();
@@ -24,7 +24,7 @@ namespace MeshTopologyCollections
         /// <param name="edgeIndex"></param>
         /// <param name="startPoint"></param>
         /// <param name="endPoint"></param>
-        internal void RegisterEdge(int edgeIndex, VertexIndex startPoint, VertexIndex endPoint)
+        public void RegisterEdge(int edgeIndex, VertexIndex startPoint, VertexIndex endPoint)
         {
             InsertEntity(ref _startPointToEdge, edgeIndex, startPoint, endPoint);
             InsertEntity(ref _endPointToEdge, edgeIndex, endPoint, startPoint);
@@ -51,7 +51,7 @@ namespace MeshTopologyCollections
         /// <param name="startIndex"></param>
         /// <param name="endIndex"></param>
         /// <returns>Returns the index of the edge. -1 if not found.</returns>
-        internal int GetEdgeIndex(VertexIndex startIndex, VertexIndex endIndex)
+        public int GetEdgeIndex(VertexIndex startIndex, VertexIndex endIndex)
         {
             EdgesOfPoint edgesStarting;
             EdgesOfPoint edgesEnding;
