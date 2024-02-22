@@ -8,7 +8,7 @@
     <Description>This library has collections to be utilized during mesh contructions.</Description>
     <IncludeSymbols>True</IncludeSymbols>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <Version>1.0.1.6</Version>
+    <Version>1.0.2</Version>
     <PackAsTool>False</PackAsTool>
   </PropertyGroup>
 
